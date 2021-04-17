@@ -18,12 +18,18 @@ def encode(df1, df2):
     diff = [x for x in objlist if x not in onehot_cat]
     
     
-    categorical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')),('encoder', OneHotEncoder(handle_unknown='ignore'))])
-    categorical_transformer2 = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')),('encoder', HashingEncoder())])
+    categorical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')),\
+                                              ('encoder', OneHotEncoder(drop='first'))])
+    
+    categorical_transformer2 = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant', fill_value='missing')),\
+                                               ('encoder', HashingEncoder())])
+    
     numeric_transformer = Pipeline(steps=[('imputer', SimpleImputer(missing_values=np.nan, strategy='most_frequent'))])
     
+    
     preprocessor = ColumnTransformer(
-    transformers=[('cat', categorical_transformer, onehot_cat), ('cat2', categorical_transformer2, diff), ('num', numeric_transformer, numlist)])
+    transformers=[('num', numeric_transformer, numlist),('cat', categorical_transformer, onehot_cat),\
+                  ('cat2', categorical_transformer2, diff)])
     
     df1 = preprocessor.fit_transform(df1)
     df2 = preprocessor.transform(df2)
